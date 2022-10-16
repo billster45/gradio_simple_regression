@@ -1,6 +1,6 @@
 
 ---
-title: timeseries-forecasting-with-prophet 
+title: simple-regression 
 emoji: 🔥
 colorFrom: indigo
 colorTo: indigo
