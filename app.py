@@ -4,18 +4,20 @@ import gradio as gr
 import seaborn as sns
 import math
 import matplotlib.pyplot as plt
+import numpy as np
 from matplotlib import collections  as mc
 
-def get_forecast(add_mul, time):
+# https://stackoverflow.com/questions/39840030/distance-between-point-and-a-line-from-two-points
+def distance(point,coef):
+    return abs((coef[0]*point[0])-point[1]+coef[1])/math.sqrt((coef[0]*coef[0])+1)
 
-        # https://stackoverflow.com/questions/39840030/distance-between-point-and-a-line-from-two-points
-    def distance(point,coef):
-        return abs((coef[0]*point[0])-point[1]+coef[1])/math.sqrt((coef[0]*coef[0])+1)
+df = pd.read_csv('https://raw.githubusercontent.com/billster45/taxi_trip_nyc/main/hsb2.csv')
 
-    df = pd.read_csv('https://raw.githubusercontent.com/billster45/taxi_trip_nyc/main/hsb2.csv')
 
+def build_model(alpha):
+    
     intercept = 22
-    slope =0.6
+    slope =alpha
 
     df['distance'] = df.apply(lambda row: distance((row['science'], row['math']),(intercept,slope)), axis=1)
     df['sqrd_dist'] = np.square(df['distance'])
@@ -29,10 +31,11 @@ def get_forecast(add_mul, time):
     vertical_line_coords = zip(data_x_y_list, slope_x_y_list)
     vertical_line_coords_list = list(vertical_line_coords)
 
-    # https://seaborn.pydata.org/tutorial/axis_grids.html#conditional-small-multiples
-    fig = plt.figure()
-    ax = fig.gca() #which is used to extract the axes
-    ax.scatter(x=df['science'],y=df['math'],color="#338844", edgecolor="white", s=50, lw=1,alpha=0.5)
+    # Plot data
+    fig,ax=plt.subplots(figsize=(7,6))
+    plt.scatter(x=df['science'],y=df['math'],color="#338844", edgecolor="white", s=50, lw=1,alpha=0.5)
+    
+    # Plot user's line
     ax.axline((0, intercept), slope=slope, color='C0', label='your slope')
     ax.set_xlim(20, 80)
     ax.set_ylim(25, 90) 
@@ -41,25 +44,14 @@ def get_forecast(add_mul, time):
     ax.set_title('Does Science Score Predict Math Score?')
     ax.legend()
 
-    # splotting grey lines
+    # Plot grey vertical lines
     lc = mc.LineCollection(vertical_line_coords_list, colors='grey', linewidths=1, zorder=1)
-    ax.add_collection(lc);
+    ax.add_collection(lc)
     
     return plt
 
-with gr.Blocks() as demo:
-    gr.Markdown(
-    """
-    Prophet forecast
-    """)
-    with gr.Row():
-        add_mul = gr.Dropdown(["additive", "multiplicative"], label="Seasonality", value="additive")
-        time = gr.Slider(2, 48, step=4,value=4, label="Forecast length")
-
-    plt = gr.Plot()
-
-    add_mul.change(get_forecast, [add_mul, time], plt, queue=False)
-    time.change(get_forecast, [add_mul, time], plt, queue=False)    
-    demo.load(get_forecast, [add_mul, time], plt, queue=False)    
-
-demo.launch(debug=True)
+inputs = gr.Slider(0, 3, label='alpha', value=1)
+outputs = gr.Plot(show_label=True)
+title = "Simple Linear regression"
+description = "Select the slope that best fits the data"
+gr.Interface(fn = build_model, inputs = inputs, outputs = outputs, title = title, description = description).launch(debug=False)
