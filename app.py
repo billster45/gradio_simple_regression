@@ -1,7 +1,6 @@
 import pandas as pd
 import statsmodels.api as sm
 import gradio as gr
-import seaborn as sns
 import math
 import matplotlib.pyplot as plt
 import numpy as np
