@@ -1,6 +1,7 @@
 import pandas as pd
 import statsmodels.api as sm
 import gradio as gr
+import seaborn as sns
 import math
 import matplotlib.pyplot as plt
 import numpy as np
@@ -13,11 +14,12 @@ def distance(point,coef):
 df = pd.read_csv('https://raw.githubusercontent.com/billster45/taxi_trip_nyc/main/hsb2.csv')
 
 
-def build_model(alpha):
+def build_model(slope_val,intercept_val):
     
-    intercept = 22
-    slope =alpha
+    intercept = intercept_val
+    slope=slope_val
 
+    # Calculate 
     df['distance'] = df.apply(lambda row: distance((row['science'], row['math']),(intercept,slope)), axis=1)
     df['sqrd_dist'] = np.square(df['distance'])
     df['yhat'] = intercept+slope*df['science']
@@ -36,8 +38,8 @@ def build_model(alpha):
     
     # Plot user's line
     ax.axline((0, intercept), slope=slope, color='C0', label='your slope')
-    ax.set_xlim(20, 80)
-    ax.set_ylim(25, 90) 
+    ax.set_xlim(0, 80)
+    ax.set_ylim(0, 90) 
     ax.set_ylabel('Math scores')
     ax.set_xlabel('Science scores')
     ax.set_title('Does Science Score Predict Math Score?')
@@ -49,8 +51,18 @@ def build_model(alpha):
     
     return plt
 
-inputs = gr.Slider(0, 3, label='alpha', value=1)
+inputs = gr.Slider(0, 3, label='Select Slope', value=1)
+inputs2 = gr.Slider(30, 80, label='Select y Intercept', value=30)
+
 outputs = gr.Plot(show_label=True)
 title = "Simple Linear regression"
 description = "Select the slope that best fits the data"
-gr.Interface(fn = build_model, inputs = inputs, outputs = outputs, title = title, description = description).launch(debug=False)
+
+# TODO provide example on launch https://gradio.app/more_on_examples_and_flagging/#providing-examples
+gr.Interface(fn = build_model, 
+             inputs = [inputs,inputs2], 
+             examples=[[1,30]],
+             outputs = outputs, 
+             title = title, 
+             description = description, 
+             live=False).launch(debug=False)
