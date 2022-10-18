@@ -5,23 +5,18 @@ import math
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import collections  as mc
-
-# https://stackoverflow.com/questions/39840030/distance-between-point-and-a-line-from-two-points
-def distance(point,coef):
-    return abs((coef[0]*point[0])-point[1]+coef[1])/math.sqrt((coef[0]*coef[0])+1)
+import statsmodels.api as sm
 
 df = pd.read_csv('https://raw.githubusercontent.com/billster45/taxi_trip_nyc/main/hsb2.csv')
-
+model = sm.OLS(df['math'], sm.add_constant(df['science'])).fit()
 
 def build_model(slope_val,intercept_val):
     
     intercept = intercept_val
     slope=slope_val
 
-    # Calculate 
-    df['distance'] = df.apply(lambda row: distance((row['science'], row['math']),(intercept,slope)), axis=1)
-    df['sqrd_dist'] = np.square(df['distance'])
     df['yhat'] = intercept+slope*df['science']
+    df['sqrd_dist'] = np.square(df['math']-df['yhat'])
 
     # combine data point co-ords with slope-cords to be able to draw vertical distance line
     df['data_x_y'] = list(zip(df.science, df.math)) # data point co-ords
@@ -31,12 +26,9 @@ def build_model(slope_val,intercept_val):
     vertical_line_coords = zip(data_x_y_list, slope_x_y_list)
     vertical_line_coords_list = list(vertical_line_coords)
 
-    # Plot data
-    fig,ax=plt.subplots(figsize=(7,6))
+    fig,ax=plt.subplots(figsize=(7,4))
     plt.scatter(x=df['science'],y=df['math'],color="#338844", edgecolor="white", s=50, lw=1,alpha=0.5)
-    
-    # Plot user's line
-    ax.axline((0, intercept), slope=slope, color='C0', label='your slope')
+    ax.axline(xy1=(0,intercept), slope=slope, color='C0', label='your slope') # https://matplotlib.org/3.5.1/gallery/pyplots/axline.html#sphx-glr-gallery-pyplots-axline-py
     ax.set_xlim(0, 80)
     ax.set_ylim(0, 90) 
     ax.set_ylabel('Math scores')
@@ -44,24 +36,52 @@ def build_model(slope_val,intercept_val):
     ax.set_title('Does Science Score Predict Math Score?')
     ax.legend()
 
-    # Plot grey vertical lines
-    lc = mc.LineCollection(vertical_line_coords_list, colors='grey', linewidths=1, zorder=1)
+    # plotting distance lines
+    if slope>=0.59 and slope<=0.61 and intercept>=21.0 and intercept<=22.0:
+        color='green'
+        width=2
+    else:
+        color='grey'
+        width=1
+
+    lc = mc.LineCollection(vertical_line_coords_list, colors=color, linewidths=width, zorder=1)
     ax.add_collection(lc)
-    
-    return plt
 
-inputs = gr.Slider(0, 3, label='Select Slope', value=1)
-inputs2 = gr.Slider(30, 80, label='Select y Intercept', value=30)
+    # rsquared calculated
+    df['ybar'] = np.mean(df['math'])
+    rss = np.sum(np.square(df['yhat']-df['ybar']))
+    tss = np.sum(np.square(df['math']-df['ybar']))
+    rsquared = round((rss/tss)*100,1)
+    text_kwargs = dict(ha='center', va='center', fontsize=14, color='C1')
+    plt.text(20, 80, 'Your R-squared is '+str(rsquared)+'%', **text_kwargs)
+    plt.text(40, 10, 'y ='+str(round(model.params[0],1))+' + '+str(round(model.params[1],1))+' x Science Score', **text_kwargs)
 
-outputs = gr.Plot(show_label=True)
+    fig1, ax  = plt.subplots(figsize=(7,1))
+    ax.barh([1], df['sqrd_dist'].sum(),
+        tick_label=['SSR'], align='center')
+    ax.set_xlim(0, 100000)
+    ax.xaxis.set_major_formatter(StrMethodFormatter('{x:,}'))
+    ax.set_title('Sum of the Squared Residuals')
+    plt.axvline(x=model.ssr,color=color, ls='solid', lw=6) # https://www.statsmodels.org/dev/generated/statsmodels.regression.linear_model.RegressionResults.html
+
+    # Model summary
+    mod_out = model.summary()
+
+    return [fig,fig1,mod_out]
+
+input_slope = gr.Slider(0, 3, label='Select Slope', value=1,step=0.1)
+input_intercept = gr.Slider(0, 80, label='Select y Intercept', value=30,step=1)
+
+outputs = [gr.Plot(label='Fit your own line'),gr.Plot(show_label=False),gr.Text(label="Model")]
 title = "Simple Linear regression"
 description = "Select the slope that best fits the data"
 
-# TODO provide example on launch https://gradio.app/more_on_examples_and_flagging/#providing-examples
 gr.Interface(fn = build_model, 
-             inputs = [inputs,inputs2], 
-             examples=[[1,30]],
+             inputs = [input_slope,input_intercept], 
              outputs = outputs, 
+             examples=[[0.6,21]],
+             cache_examples=True,
+             allow_flagging='never',
              title = title, 
              description = description, 
              live=False).launch(debug=False)
