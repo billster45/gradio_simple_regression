@@ -47,7 +47,8 @@ def build_model(slope_val,intercept_val):
 
     lc = mc.LineCollection(vertical_line_coords_list, colors=color, linewidths=width, zorder=1)
     ax.add_collection(lc)
-
+    
+    text_kwargs = dict(ha='center', va='center', fontsize=14, color='C1')
     plt.text(40, 10, 'y ='+str(round(model.params[0],1))+' + '+str(round(model.params[1],1))+' x Science Score', **text_kwargs)
 
     fig1, ax  = plt.subplots(figsize=(7,1))
