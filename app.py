@@ -51,7 +51,7 @@ def build_model(intercept_val,slope_val):
     plt.text(75, 20, 'Your line: y = '+str(round(intercept,1))+' + '+str(round(slope,1))+' x Science Score', **text_kwargs)
     plt.text(75, 10, 'Best OLS fit line: y = '+str(round(model.params[0],1))+' + '+str(round(model.params[1],1))+' x Science Score', **text_kwargs)
 
-    fig1, ax  = plt.subplots(figsize=(7,1))
+    fig1, ax  = plt.subplots(figsize=(7,2))
     ax.barh([1], df['sqrd_dist'].sum(),tick_label=['SSR'], align='center',alpha=0.5)
     ax.set_xlim(0, 100000)
     ax.xaxis.set_major_formatter(StrMethodFormatter('{x:,}'))
