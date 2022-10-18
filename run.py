@@ -35,12 +35,11 @@ def build_model(intercept_val,slope_val):
     ax.set_ylabel('Math scores')
     ax.set_xlabel('Science scores')
     ax.set_title('Does Science Score Predict Math Score?')
-    ax.legend()
 
     # plotting distance lines
-    if slope==0.6 and intercept<=21.7:
+    if slope==0.6 and intercept==21.7:
         color='green'
-        width=4
+        width=3
     else:
         color='grey'
         width=1
@@ -53,11 +52,10 @@ def build_model(intercept_val,slope_val):
     plt.text(75, 10, 'Best OLS fit line: y = '+str(round(model.params[0],1))+' + '+str(round(model.params[1],1))+' x Science Score', **text_kwargs)
 
     fig1, ax  = plt.subplots(figsize=(7,1))
-    ax.barh([1], df['sqrd_dist'].sum(),
-        tick_label=['SSR'], align='center')
+    ax.barh([1], df['sqrd_dist'].sum(),tick_label=['SSR'], align='center',alpha=0.5)
     ax.set_xlim(0, 100000)
     ax.xaxis.set_major_formatter(StrMethodFormatter('{x:,}'))
-    ax.set_title('Sum of the Squared Residuals')
+    plt.text(80000,1,'Sum of the Squared Residuals', **text_kwargs)
     plt.axvline(x=model.ssr,color=color, ls='solid', lw=6) # https://www.statsmodels.org/dev/generated/statsmodels.regression.linear_model.RegressionResults.html
 
     # Model summary
