@@ -3,6 +3,7 @@ import statsmodels.api as sm
 import gradio as gr
 import math
 import numpy as np
+import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib import collections  as mc
 from matplotlib.ticker import FormatStrFormatter, StrMethodFormatter
