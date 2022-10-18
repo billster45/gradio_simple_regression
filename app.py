@@ -27,7 +27,7 @@ def build_model(slope_val,intercept_val):
     vertical_line_coords = zip(data_x_y_list, slope_x_y_list)
     vertical_line_coords_list = list(vertical_line_coords)
 
-    fig,ax=plt.subplots(figsize=(7,3))
+    fig,ax=plt.subplots(figsize=(7,4))
     plt.scatter(x=df['science'],y=df['math'],color="#338844", edgecolor="white", s=50, lw=1,alpha=0.5)
     ax.axline(xy1=(0,intercept), slope=slope, color='C0') # https://matplotlib.org/3.5.1/gallery/pyplots/axline.html#sphx-glr-gallery-pyplots-axline-py
     ax.set_xlim(0, 80)
@@ -48,10 +48,11 @@ def build_model(slope_val,intercept_val):
     lc = mc.LineCollection(vertical_line_coords_list, colors=color, linewidths=width, zorder=1)
     ax.add_collection(lc)
 
-    text_kwargs = dict(ha='center', va='center', fontsize=14, color='C1')
-    plt.text(40, 10, 'y ='+str(round(model.params[0],1))+' + '+str(round(model.params[1],1))+' x Science Score', **text_kwargs)
+    text_kwargs = dict(ha='right', va='center', fontsize=14, color='C1')
+    plt.text(75, 20, 'Your line: y = '+str(round(intercept,1))+' + '+str(round(slope,1))+' x Science Score', **text_kwargs)
+    plt.text(75, 10, 'Best OLS fit line: y = '+str(round(model.params[0],1))+' + '+str(round(model.params[1],1))+' x Science Score', **text_kwargs)
 
-    fig1, ax  = plt.subplots(figsize=(7,2))
+    fig1, ax  = plt.subplots(figsize=(7,1))
     ax.barh([1], df['sqrd_dist'].sum(),
         tick_label=['SSR'], align='center')
     ax.set_xlim(0, 100000)
@@ -79,4 +80,4 @@ gr.Interface(fn = build_model,
              allow_flagging='never',
              title = title, 
              description = description, 
-             live=False).launch(debug=False)
+             live=True).launch(debug=False)
