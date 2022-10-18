@@ -11,7 +11,7 @@ import statsmodels.api as sm
 df = pd.read_csv('https://raw.githubusercontent.com/billster45/taxi_trip_nyc/main/hsb2.csv')
 model = sm.OLS(df['math'], sm.add_constant(df['science'])).fit()
 
-def build_model(slope_val,intercept_val):
+def build_model(intercept_val,slope_val):
     
     intercept = intercept_val
     slope=slope_val
@@ -38,7 +38,7 @@ def build_model(slope_val,intercept_val):
     ax.legend()
 
     # plotting distance lines
-    if slope>=0.59 and slope<=0.61 and intercept>=21.0 and intercept<=22.0:
+    if slope==0.6 and intercept<=21.7:
         color='green'
         width=4
     else:
@@ -65,17 +65,17 @@ def build_model(slope_val,intercept_val):
 
     return [fig,fig1,mod_out]
 
-input_slope = gr.Slider(0, 3, label='Select Slope', value=1,step=0.1)
 input_intercept = gr.Slider(0, 80, label='Select y Intercept', value=30,step=0.1)
+input_slope = gr.Slider(0, 3, label='Select Slope', value=1,step=0.1)
 
 outputs = [gr.Plot(label='Fit your own line'),gr.Plot(show_label=False),gr.Text(label="Model")]
 title = "Simple Linear regression"
 description = "Select the slope and intercept that best fits the data"
 
 gr.Interface(fn = build_model, 
-             inputs = [input_slope,input_intercept], 
+             inputs = [input_intercept,input_slope], 
              outputs = outputs, 
-             examples=[[model.params[1],model.params[0]]],
+             examples=[[21.7,0.6]],
              cache_examples=True,
              allow_flagging='never',
              title = title, 
