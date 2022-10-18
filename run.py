@@ -29,7 +29,7 @@ def build_model(slope_val,intercept_val):
 
     fig,ax=plt.subplots(figsize=(7,4))
     plt.scatter(x=df['science'],y=df['math'],color="#338844", edgecolor="white", s=50, lw=1,alpha=0.5)
-    ax.axline(xy1=(0,intercept), slope=slope, color='C0', label='your slope') # https://matplotlib.org/3.5.1/gallery/pyplots/axline.html#sphx-glr-gallery-pyplots-axline-py
+    ax.axline(xy1=(0,intercept), slope=slope, color='C0') # https://matplotlib.org/3.5.1/gallery/pyplots/axline.html#sphx-glr-gallery-pyplots-axline-py
     ax.set_xlim(0, 80)
     ax.set_ylim(0, 90) 
     ax.set_ylabel('Math scores')
@@ -40,7 +40,7 @@ def build_model(slope_val,intercept_val):
     # plotting distance lines
     if slope>=0.59 and slope<=0.61 and intercept>=21.0 and intercept<=22.0:
         color='green'
-        width=2
+        width=4
     else:
         color='grey'
         width=1
@@ -48,13 +48,6 @@ def build_model(slope_val,intercept_val):
     lc = mc.LineCollection(vertical_line_coords_list, colors=color, linewidths=width, zorder=1)
     ax.add_collection(lc)
 
-    # rsquared calculated
-    df['ybar'] = np.mean(df['math'])
-    rss = np.sum(np.square(df['yhat']-df['ybar']))
-    tss = np.sum(np.square(df['math']-df['ybar']))
-    rsquared = round((rss/tss)*100,1)
-    text_kwargs = dict(ha='center', va='center', fontsize=14, color='C1')
-    plt.text(20, 80, 'Your R-squared is '+str(rsquared)+'%', **text_kwargs)
     plt.text(40, 10, 'y ='+str(round(model.params[0],1))+' + '+str(round(model.params[1],1))+' x Science Score', **text_kwargs)
 
     fig1, ax  = plt.subplots(figsize=(7,1))
@@ -71,16 +64,16 @@ def build_model(slope_val,intercept_val):
     return [fig,fig1,mod_out]
 
 input_slope = gr.Slider(0, 3, label='Select Slope', value=1,step=0.1)
-input_intercept = gr.Slider(0, 80, label='Select y Intercept', value=30,step=1)
+input_intercept = gr.Slider(0, 80, label='Select y Intercept', value=30,step=0.1)
 
 outputs = [gr.Plot(label='Fit your own line'),gr.Plot(show_label=False),gr.Text(label="Model")]
 title = "Simple Linear regression"
-description = "Select the slope that best fits the data"
+description = "Select the slope and intercept that best fits the data"
 
 gr.Interface(fn = build_model, 
              inputs = [input_slope,input_intercept], 
              outputs = outputs, 
-             examples=[[0.6,21]],
+             examples=[[model.params[1],model.params[0]]],
              cache_examples=True,
              allow_flagging='never',
              title = title, 
