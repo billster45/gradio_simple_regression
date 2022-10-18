@@ -2,9 +2,10 @@ import pandas as pd
 import statsmodels.api as sm
 import gradio as gr
 import math
-import matplotlib.pyplot as plt
 import numpy as np
+import matplotlib.pyplot as plt
 from matplotlib import collections  as mc
+from matplotlib.ticker import FormatStrFormatter, StrMethodFormatter
 import statsmodels.api as sm
 
 df = pd.read_csv('https://raw.githubusercontent.com/billster45/taxi_trip_nyc/main/hsb2.csv')
