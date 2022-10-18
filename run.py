@@ -70,7 +70,8 @@ outputs = [gr.Plot(label='Fit your own line'),gr.Plot(show_label=False),gr.Text(
 title = "Simple Linear regression"
 description = "Select the slope and intercept that best fits the data"
 
-gr.Interface(fn = build_model, 
+# https://github.com/gradio-app/gradio/issues/2093#issuecomment-1248657665
+io = gr.Interface(fn = build_model, 
              inputs = [input_intercept,input_slope], 
              outputs = outputs, 
              examples=[[21.7,0.6]],
@@ -78,4 +79,8 @@ gr.Interface(fn = build_model,
              allow_flagging='never',
              title = title, 
              description = description, 
-             live=True).launch(debug=False)
+             live=True)
+
+io.dependencies[0]["show_progress"] = False  # the hack
+
+io.launch()
