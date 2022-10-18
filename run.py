@@ -84,4 +84,4 @@ io = gr.Interface(fn = build_model,
 io.dependencies[0]["show_progress"] = False  # the hack
 io.dependencies[1]["show_progress"] = False  # the hack
 
-io.launch()
+io.launch(share=True)
