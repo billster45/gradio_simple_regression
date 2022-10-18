@@ -53,9 +53,9 @@ def build_model(intercept_val,slope_val):
 
     fig1, ax  = plt.subplots(figsize=(7,2))
     ax.barh([1], df['sqrd_dist'].sum(),tick_label=['SSR'], align='center',alpha=0.5)
-    ax.set_xlim(0, 100000)
-    ax.xaxis.set_major_formatter(StrMethodFormatter('{x:,}'))
-    plt.text(80000,1,'Sum of the Squared Residuals', **text_kwargs)
+    ax.set_xlim(0, 150000)
+    ax.get_xaxis().set_major_formatter(matplotlib.ticker.FuncFormatter(lambda x, p: format(int(x), ',')))
+    plt.text(120000,1,'Sum of the Squared Residuals', **text_kwargs)
     plt.axvline(x=model.ssr,color=color, ls='solid', lw=6) # https://www.statsmodels.org/dev/generated/statsmodels.regression.linear_model.RegressionResults.html
 
     # Model summary
@@ -84,4 +84,4 @@ io = gr.Interface(fn = build_model,
 io.dependencies[0]["show_progress"] = False  # the hack
 io.dependencies[1]["show_progress"] = False  # the hack
 
-io.launch()
+io.launch(share=True)
